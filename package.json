@@ -1,0 +1,17 @@
+{
+  "name": "gd-toolkit",
+  "version": "1.0.0",
+  "description": "Command-line toolkit for GeometricalDomination",
+  "keywords": [
+    "gd",
+    "geometricaldomination",
+    "toolkit"
+  ],
+  "license": "MIT",
+  "author": "Miah M. Sabiq",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
