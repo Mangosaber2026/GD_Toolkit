@@ -9,9 +9,11 @@
   ],
   "license": "MIT",
   "author": "Miah M. Sabiq",
-  "type": "commonjs",
-  "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6"
   }
 }
