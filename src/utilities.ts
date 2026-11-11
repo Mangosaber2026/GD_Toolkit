@@ -5,34 +5,79 @@ import * as csl_tool from "./console_toolkit.js";
 
 const execFileAsync = node_util.promisify(execFile);
 
+export async function getPythonVersions(): Promise<string[]> {
+    const { stdout } = await execFileAsync(
+        "py",
+        ["list", "--format=exe"]
+    );
+
+    const executablePaths = stdout
+        .split(/\r?\n/)
+        .map(path => path.trim())
+        .filter(Boolean);
+
+    const versions = await Promise.all(
+    executablePaths.map(async executable => {
+        try {
+            const { stdout, stderr } = await execFileAsync(
+                executable,
+                ["--version"]
+            );
+
+            const output = `${stdout}\n${stderr}`;
+            const match = output.match(/Python\s+(\d+\.\d+(?:\.\d+)?)/);
+
+            return match?.[1] ?? null;
+        } catch {
+            return null;
+        }
+    })
+    );
+
+    return versions.filter(
+        (version): version is string => version !== null
+    );
+}
+
+
+export function isCompatiblePythonVersion(
+    versionText: string
+): boolean {
+    const [major = 0, minor = 0] =
+        versionText.split(".").map(Number);
+
+    return major > 3 || (major === 3 && minor >= 15);
+}
+
+
 export async function checkPython(): Promise<boolean> {
     try {
-        const { stdout, stderr } = await execFileAsync(
-            "py",
-            ["-3.15", "--version"]
+        const versions = await getPythonVersions();
+
+        const compatibleVersions = versions.filter(
+            isCompatiblePythonVersion
         );
-        
-        const versionText = (stdout || stderr).trim().replace("Python ", "");
-        const [major = 0, minor = 0, patch = 0] =
-            versionText.split(".").map(Number);
 
-        csl_tool.ConsoleToolkit.information(`Detected Python ${versionText}`);
-
-        const compatible =
-            major >= 4 || (major === 3 && minor >= 15);
-
-        if (compatible) {
-            csl_tool.ConsoleToolkit.information("Python version is compatible with GD!");
-        } else {
-            csl_tool.ConsoleToolkit.error("Python version is too old for GD.");
+        if (compatibleVersions.length === 0) {
+            csl_tool.ConsoleToolkit.error(
+                "No compatible Python installation was found."
+            );
+            return false;
         }
 
-        return compatible;
+        csl_tool.ConsoleToolkit.information(
+            `Compatible Python installations: ${compatibleVersions.join(", ")}`
+        );
+
+        return true;
     } catch {
-        csl_tool.ConsoleToolkit.error("Python 3.15 is not available.");
+        csl_tool.ConsoleToolkit.error(
+            "Could not discover installed Python versions."
+        );
         return false;
     }
 }
+
 
 export async function getInfoGD(): Promise<types.GDInfo | null> {
     try {
@@ -83,7 +128,9 @@ export async function getInfoGD(): Promise<types.GDInfo | null> {
         return info;
 
     } catch {
-        csl_tool.ConsoleToolkit.information("Could not retrieve GD package information.");
+        csl_tool.ConsoleToolkit.information(
+            "Could not retrieve GD package information."
+        );
         return null;
     }
 }

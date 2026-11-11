@@ -1,23 +1,29 @@
 
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
+      "target": "ESNext",
+      "module": "ESNext",
+      "moduleResolution": "bundler",
 
-    "rootDir": "./src",
-    "outDir": "./dist",
+      "rootDir": "./src",
+      "outDir": "./src/dist",
 
-    "lib": ["ESNext"],
-    "types": ["node"],
+      "lib": ["ESNext", "DOM", "DOM.Iterable"],
+      "types": ["node"],
 
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+      "strict": true,
+      "noUncheckedIndexedAccess": true,
+      "exactOptionalPropertyTypes": true,
 
-    "verbatimModuleSyntax": true,
+      "verbatimModuleSyntax": true,
 
-    "sourceMap": true,
-    "noEmitOnError": true,
-    "skipLibCheck": true
-  }
+      "sourceMap": true,
+      "noEmitOnError": true,
+      "skipLibCheck": true,
+
+      "jsx": "react-jsx",
+      "noEmit": true
+  },
+  
+  "include": ["src"]
 }
